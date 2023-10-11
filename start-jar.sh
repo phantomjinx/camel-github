@@ -17,15 +17,17 @@ done
 
 shift `expr $OPTIND - 1`
 
-env
-
 if [ -z "${GITHUB_TOKEN}" ]; then
-  echo "Need to specify a github authentitcation token using (-t) or as an environment variable (GITHUB_TOKEN)"
+  echo "Need to specify a github authentication token using (-t) or as an environment variable (GITHUB_TOKEN)"
   exit 1
 fi
 
 rm -rf ${HOME}/camel-github/* && \
-clear && \
-mvn clean \
-  spring-boot:run \
-  -D github.token=${GITHUB_TOKEN}
+clear
+
+JAR_FILE=$(find target -maxdepth 1 -name "*.jar")
+if [ ! -f "${JAR_FILE}" ]; then
+  echo "Using jar file: ${JAR_FILE}"
+fi
+
+java -Dgithub.token=${GITHUB_TOKEN} -jar "${JAR_FILE}"

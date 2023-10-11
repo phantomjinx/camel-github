@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: camel-github
+    version: 1.0.0
+    group: io.hawt
+  name: camel-github
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: camel-github
+      group: io.hawt
+  template:
+    metadata:
+      annotations:
+        hawt.io/protocol: http
+        hawt.io/jolokiaPath: /actuator/jolokia/
+      labels:
+        app: camel-github
+        provider: jkube
+        version: 1.0.0
+        group: io.hawt
+      name: camel-github
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AB_JOLOKIA_AUTH_OPENSHIFT
+          value: false
+        - name: AB_JOLOKIA_PASSWORD_RANDOM
+          value: false
+        - name: AB_JOLOKIA_OPTS
+          value: useSslClientAuthentication=false,protocol=https
+        image: quay.io/phantomjinx/camel-github:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/jolokia/version
+            port: 10001
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: phantomjinx-camel-github
+        ports:
+        - containerPort: 10001
+          name: jolokia
+          protocol: TCP
+        - containerPort: 10000
+          name: ndmp
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/jolokia/version
+            port: 10001
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1.0"
+            memory: 256Mi
+          requests:
+            cpu: "0.2"
+            memory: 256Mi
+        securityContext:
+          privileged: false
