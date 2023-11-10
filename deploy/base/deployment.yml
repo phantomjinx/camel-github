@@ -25,6 +25,10 @@ spec:
         group: io.hawt
       name: camel-github
     spec:
+      volumes:
+        - name: camel-github-storage
+          persistentVolumeClaim:
+            claimName: camel-github-storage
       containers:
       - env:
         - name: KUBERNETES_NAMESPACE
@@ -36,13 +40,18 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: AB_JOLOKIA_AUTH_OPENSHIFT
-          value: false
+          value: "false"
         - name: AB_JOLOKIA_PASSWORD_RANDOM
-          value: false
+          value: "false"
         - name: AB_JOLOKIA_OPTS
-          value: useSslClientAuthentication=false,protocol=https
+          value: "useSslClientAuthentication=false,protocol=https"
+        - name: GITHUB_TOKEN
+          value: "MY_GITHUB_TOKEN"
         image: quay.io/phantomjinx/camel-github:latest
         imagePullPolicy: Always
+        volumeMounts:
+          - name: camel-github-storage
+            mountPath: /camel-github/enhanced/json
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -67,14 +76,14 @@ spec:
             path: /actuator/jolokia/version
             port: 10001
             scheme: HTTP
-          initialDelaySeconds: 10
+          initialDelaySeconds: 120
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
         resources:
           limits:
             cpu: "1.0"
-            memory: 256Mi
+            memory: 500Mi
           requests:
             cpu: "0.2"
             memory: 256Mi

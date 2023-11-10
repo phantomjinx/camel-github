@@ -80,16 +80,18 @@ endif
 #
 DRY_RUN ?= false
 NAMESPACE ?= hawtio-dev
+GITHUB_TOKEN ?= <not-defined>
 
 # Cluster on which to install [ openshift | k8s ]
 CLUSTER_TYPE ?= k8s
 
 # Uninstall all hawtio-onlineresources: [true|false]
-UNINSTALL_ALL ?=false
+UNINSTALL_ALL ?= false
 
 DEPLOY := deploy
 PATCHES := patches
 PLACEHOLDER := placeholder
+GITHUB_TOKEN_PLACEHOLDER := MY_GITHUB_TOKEN
 
 #
 # Macro for editing kustomization to define
@@ -121,6 +123,12 @@ endef
 check-admin: kubectl
 	@output=$$(kubectl get crd 2>&1) || (echo "****" && echo "**** ERROR: Cannot continue as user is not a Cluster-Admin ****" && echo "****"; exit 1)
 
+github-token:
+ifeq ($(GITHUB_TOKEN), <not-defined>)
+	$(error GITHUB_TOKEN is required and not defined)
+endif
+	@echo "Using GITHUB_TOKEN: $(GITHUB_TOKEN)"
+
 #---
 #
 #@ install
@@ -132,13 +140,14 @@ check-admin: kubectl
 #
 #* PARAMETERS:
 #** CLUSTER_TYPE:        Set the cluster type to install on [ openshift | k8s ]
+#** GITHUB_TOKEN:        Set the github token to use for access
 #** NAMESPACE:           Set the namespace for the resources
 #** CUSTOM_IMAGE:        Set a custom image to install from
 #** CUSTOM_VERSION:      Set a custom version to install from
 #** DRY_RUN:             Print the resources to be applied instead of applying them [ true | false ]
 #
 #---
-install: kustomize kubectl
+install: kustomize kubectl github-token
 # Set the namespace in the setup kustomization yaml
 	@$(call set-kustomize-namespace, $(DEPLOY)/$(CLUSTER_TYPE))
 # Set the image reference of the kustomization
@@ -152,10 +161,12 @@ install: kustomize kubectl
 ifeq ($(DRY_RUN), false)
 	@$(KUSTOMIZE) build $(KOPTIONS) $(DEPLOY)/$(CLUSTER_TYPE) | \
 		sed 's/$(PLACEHOLDER)/$(NAMESPACE)/' | \
+		sed 's/$(GITHUB_TOKEN_PLACEHOLDER)/$(GITHUB_TOKEN)/' | \
 		kubectl apply -f -
 else
 	@$(KUSTOMIZE) build $(KOPTIONS) $(DEPLOY)/$(CLUSTER_TYPE) | \
-		sed 's/$(PLACEHOLDER)/$(NAMESPACE)/'
+		sed 's/$(PLACEHOLDER)/$(NAMESPACE)/' | \
+		sed 's/$(GITHUB_TOKEN_PLACEHOLDER)/$(GITHUB_TOKEN)/'
 endif
 
 #---
