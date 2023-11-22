@@ -80,7 +80,11 @@ endif
 #
 DRY_RUN ?= false
 NAMESPACE ?= hawtio-dev
+GITHUB_REPO_BRANCH ?= 4.x
+GITHUB_REPO_NAME ?= hawtio
+GITHUB_REPO_OWNER ?= hawtio
 GITHUB_TOKEN ?= <not-defined>
+GITHUB_REQUEST_DELAY ?= 1500
 
 # Cluster on which to install [ openshift | k8s ]
 CLUSTER_TYPE ?= k8s
@@ -92,6 +96,10 @@ DEPLOY := deploy
 PATCHES := patches
 PLACEHOLDER := placeholder
 GITHUB_TOKEN_PLACEHOLDER := MY_GITHUB_TOKEN
+GITHUB_REPO_BRANCH_PLACEHOLDER := MY_GITHUB_REPO_BRANCH
+GITHUB_REPO_NAME_PLACEHOLDER := MY_GITHUB_REPO_NAME
+GITHUB_REPO_OWNER_PLACEHOLDER := MY_GITHUB_REPO_OWNER
+GITHUB_REQUEST_DELAY_PLACEHOLDER := MY_GITHUB_REQUEST_DELAY
 
 #
 # Macro for editing kustomization to define
@@ -129,6 +137,12 @@ ifeq ($(GITHUB_TOKEN), <not-defined>)
 endif
 	@echo "Using GITHUB_TOKEN: $(GITHUB_TOKEN)"
 
+github-option-values:
+    @echo "Using GITHUB_REPO_BRANCH: $(GITHUB_REPO_BRANCH)"
+    @echo "Using GITHUB_REPO_NAME: $(GITHUB_REPO_NAME)"
+    @echo "Using GITHUB_REPO_OWNER: $(GITHUB_REPO_OWNER)"
+    @echo "Using GITHUB_REQUEST_DELAY: $(GITHUB_REQUEST_DELAY)"
+    
 #---
 #
 #@ install
@@ -140,6 +154,10 @@ endif
 #
 #* PARAMETERS:
 #** CLUSTER_TYPE:        Set the cluster type to install on [ openshift | k8s ]
+#** GITHUB_REPO_BRANCH:      Set the repository branch
+#** GITHUB_REPO_NAME:      Set the repository name
+#** GITHUB_REPO_OWNER:      Set the repository owner
+#** GITHUB_REQUEST_DELAY:      Set the delay between calls to the github api
 #** GITHUB_TOKEN:        Set the github token to use for access
 #** NAMESPACE:           Set the namespace for the resources
 #** CUSTOM_IMAGE:        Set a custom image to install from
@@ -147,7 +165,7 @@ endif
 #** DRY_RUN:             Print the resources to be applied instead of applying them [ true | false ]
 #
 #---
-install: kustomize kubectl github-token
+install: kustomize kubectl github-token github-option-values
 # Set the namespace in the setup kustomization yaml
 	@$(call set-kustomize-namespace, $(DEPLOY)/$(CLUSTER_TYPE))
 # Set the image reference of the kustomization
@@ -161,11 +179,19 @@ install: kustomize kubectl github-token
 ifeq ($(DRY_RUN), false)
 	@$(KUSTOMIZE) build $(KOPTIONS) $(DEPLOY)/$(CLUSTER_TYPE) | \
 		sed 's/$(PLACEHOLDER)/$(NAMESPACE)/' | \
+        sed 's/$(GITHUB_REPO_BRANCH_PLACEHOLDER)/$(GITHUB_REPO_BRANCH)/' | \
+        sed 's/$(GITHUB_REPO_NAME_PLACEHOLDER)/$(GITHUB_REPO_NAME)/' | \
+        sed 's/$(GITHUB_REPO_OWNER_PLACEHOLDER)/$(GITHUB_REPO_OWNER)/' | \
+        sed 's/$(GITHUB_REQUEST_DELAY_PLACEHOLDER)/"$(GITHUB_REQUEST_DELAY)"/' | \
 		sed 's/$(GITHUB_TOKEN_PLACEHOLDER)/$(GITHUB_TOKEN)/' | \
 		kubectl apply -f -
 else
 	@$(KUSTOMIZE) build $(KOPTIONS) $(DEPLOY)/$(CLUSTER_TYPE) | \
 		sed 's/$(PLACEHOLDER)/$(NAMESPACE)/' | \
+        sed 's/$(GITHUB_REPO_BRANCH_PLACEHOLDER)/$(GITHUB_REPO_BRANCH)/' | \
+        sed 's/$(GITHUB_REPO_NAME_PLACEHOLDER)/$(GITHUB_REPO_NAME)/' | \
+        sed 's/$(GITHUB_REPO_OWNER_PLACEHOLDER)/$(GITHUB_REPO_OWNER)/' | \
+		sed 's/$(GITHUB_REQUEST_DELAY_PLACEHOLDER)/"$(GITHUB_REQUEST_DELAY)"/' | \
 		sed 's/$(GITHUB_TOKEN_PLACEHOLDER)/$(GITHUB_TOKEN)/'
 endif
 

@@ -45,6 +45,14 @@ spec:
           value: "false"
         - name: AB_JOLOKIA_OPTS
           value: "useSslClientAuthentication=false,protocol=https"
+        - name: GITHUB_REPO_BRANCH
+          value: "MY_GITHUB_REPO_BRANCH"
+        - name: GITHUB_REPO_NAME
+          value: "MY_GITHUB_REPO_NAME"
+        - name: GITHUB_REPO_OWNER
+          value: "MY_GITHUB_REPO_OWNER"
+        - name: GITHUB_REQUEST_DELAY
+          value: "MY_GITHUB_REQUEST_DELAY"
         - name: GITHUB_TOKEN
           value: "MY_GITHUB_TOKEN"
         image: quay.io/phantomjinx/camel-github:latest

@@ -15,13 +15,19 @@ import io.hawt.Constants;
 
 public class FileProcessor implements Processor, Constants {
 
-//    private static Object locked = new Object();
+    private static Object locked = new Object();
     
     private Gson gson;
     private String baseDir;
 
-    public FileProcessor(String baseDir) {
+    private int delay;
+
+    public FileProcessor(String baseDir, String delay) {
+        System.out.println("File Processor Base Directory: " + baseDir);
         this.baseDir = baseDir;
+        System.out.println("File Processor Delay: " + delay);
+        this.delay = Integer.parseInt(delay);
+
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
@@ -52,9 +58,12 @@ public class FileProcessor implements Processor, Constants {
             json.addProperty(id, value);
         }
 
-//        synchronized(locked) {
-//            Thread.sleep(5000);
-//        }
+        /*
+         * Active delay to slow down the collecting of commits / hour
+         */
+        synchronized(locked) {
+            Thread.sleep(delay);
+        }
 
         String filename = baseDir + File.separator + sha + ".json";
         exchange.getMessage().setHeader(Exchange.FILE_NAME, filename);

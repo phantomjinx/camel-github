@@ -9,20 +9,29 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.github.GitHubType;
 import org.apache.camel.model.rest.RestBindingMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.hawt.Constants;
 import io.hawt.processor.FileProcessor;
 
 @Component
-@PropertySource("classpath:application.properties")
 public class CommitRouter extends RouteBuilder implements Constants {
 
-    @Autowired
-    private Environment env;
+    @Value("${github.token}")
+    private String githubAuthToken;
+
+    @Value("${github.repo.owner}")
+    private String githubRepoOwner;
+
+    @Value("${github.repo.name}")
+    private String githubRepoName;
+
+    @Value("${github.repo.branch}")
+    private String githubRepoBranch;
+
+    @Value( "${github.request.delay}" )
+    private String delay;
 
     @Override
     public void configure() {
@@ -33,15 +42,15 @@ public class CommitRouter extends RouteBuilder implements Constants {
 
         StringBuilder params = new StringBuilder();
         params
-            .append("repoName=" + env.getProperty(REPO_NAME_KEY)).append("&")
-            .append("repoOwner=" + env.getProperty(REPO_OWNER_KEY)).append("&")
-            .append("oauthToken=" + env.getProperty(AUTH_TOKEN_KEY)).append("&")
+            .append("repoName=" + githubRepoName).append("&")
+            .append("repoOwner=" + githubRepoOwner).append("&")
+            .append("oauthToken=" + githubAuthToken).append("&")
             .append("delay=500");
-        
-        from("github:" + GitHubType.COMMIT + "/" + env.getProperty(REPO_BRANCH_KEY) + "?" + params)
+
+        from("github:" + GitHubType.COMMIT + "/" + githubRepoBranch + "?" + params)
             .group("io.hawt.commits")
             .routeId("commitToFiles")
-            .process(new FileProcessor(JSON))
+            .process(new FileProcessor(JSON, delay))
             .delay(250) // artificial slow down
             .log("Commit: ${body}")
             .to("file://" + ENHANCED_DEST_DIR);
