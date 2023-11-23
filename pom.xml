@@ -5,7 +5,7 @@
     <groupId>io.hawt</groupId>
     <artifactId>camel-github</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>A Camel Spring Boot Route</name>
 
     <properties>
@@ -13,10 +13,10 @@
         <github.token>TO_BE_SPECIFIED_ON_CLI</github.token>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot-version>2.7.10</spring.boot-version>
+        <spring.boot-version>3.1.5</spring.boot-version>
         <surefire.plugin.version>3.0.0-M4</surefire.plugin.version>
-        <camel.version>3.20.3</camel.version>
-        <hawtio.version>3.0-M8</hawtio.version>
+        <camel.version>4.2.0</camel.version>
+        <hawtio.version>4.0-M3</hawtio.version>
     </properties>
 
     <dependencyManagement>
@@ -52,9 +52,19 @@
                 <artifactId>camel-github</artifactId>
                 <version>${camel.version}</version>
             </dependency>
+             <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-management</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
                <artifactId>camel-servlet</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-spring-xml</artifactId>
                 <version>${camel.version}</version>
             </dependency>
             <dependency>
@@ -175,6 +185,10 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-github</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring-xml</artifactId>
         </dependency>
         
 

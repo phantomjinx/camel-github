@@ -7,4 +7,4 @@ namespace: hawtio-dev
 images:
 - name: quay.io/phantomjinx/camel-github
   newName: quay.io/phantomjinx/camel-github
-  newTag: 1.0.0-20231011_203947
+  newTag: 1.0.2-202311231400

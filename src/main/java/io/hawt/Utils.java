@@ -23,14 +23,13 @@ public class Utils {
     }
 
     public static void enableStatsAndInflightBrowse(CamelContext context) {
-        ExtendedCamelContext extendedCamelContext = context.adapt(ExtendedCamelContext.class);
+        ExtendedCamelContext extendedCamelContext = context.getCamelContextExtension();
         extendedCamelContext.getExchangeFactoryManager().setStatisticsEnabled(true);
         extendedCamelContext.getExchangeFactory().setStatisticsEnabled(true);
         extendedCamelContext.getProcessorExchangeFactory().setStatisticsEnabled(true);
-        extendedCamelContext.getAsyncProcessorAwaitManager().getStatistics().setStatisticsEnabled(true);
 
         // Enable performance stats for endpoint statistics
-        ManagementAgent agent = extendedCamelContext.getManagementStrategy().getManagementAgent();
+        ManagementAgent agent = context.getManagementStrategy().getManagementAgent();
         agent.setLoadStatisticsEnabled(true);
         agent.setEndpointRuntimeStatisticsEnabled(true);
         agent.setStatisticsLevel(ManagementStatisticsLevel.Extended);
