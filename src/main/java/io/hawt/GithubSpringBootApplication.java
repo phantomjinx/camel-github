@@ -16,6 +16,12 @@ public class GithubSpringBootApplication {
      * @throws Exception 
      */
     public static void main(String[] args) throws Exception {
+        String token = System.getProperty("github.token","");
+        if (token.length() == 0) {
+          System.out.println("Error: No github.token property was specified.");
+          System.exit(1);
+        }
+
         SpringApplication.run(GithubSpringBootApplication.class, args);
     }
 

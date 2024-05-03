@@ -10,7 +10,12 @@
 
     <properties>
         <!-- need to specify this on command-line using -D -->
-        <github.token>TO_BE_SPECIFIED_ON_CLI</github.token>
+        <github.token></github.token>
+        <github.repo.owner>hawtio</github.repo.owner>
+        <github.repo.name>hawtio</github.repo.name>
+        <github.repo.branch>4.x</github.repo.branch>
+        <github.request.delay>1500</github.request.delay>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.boot-version>3.1.5</spring.boot-version>
@@ -146,7 +151,7 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-github-starter</artifactId>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
@@ -190,7 +195,7 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring-xml</artifactId>
         </dependency>
-        
+
 
         <!--
           To enable Camel plugin debugging feature, add this dependency.
@@ -237,6 +242,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot-version}</version>
+                <configuration>
+                  <systemPropertyVariables>
+                    <github.token>${github.token}</github.token>
+                    <github.repo.owner>${github.repo.owner}</github.repo.owner>
+                    <github.repo.name>${github.repo.name}</github.repo.name>
+                    <github.repo.branch>${github.repo.branch}</github.repo.branch>
+                    <github.request.delay>${github.request.delay}</github.request.delay>
+                  </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
