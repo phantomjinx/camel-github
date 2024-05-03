@@ -19,7 +19,7 @@
 #
 SHELL := /bin/bash
 
-VERSION ?= 1.0.0-$(shell date +%Y%m%d_%H%M%S)
+VERSION ?= 1.0.2
 KUSTOMIZE_VERSION := v4.5.4
 IMAGE_NAME ?= quay.io/phantomjinx/camel-github
 
@@ -142,7 +142,7 @@ github-option-values:
     @echo "Using GITHUB_REPO_NAME: $(GITHUB_REPO_NAME)"
     @echo "Using GITHUB_REPO_OWNER: $(GITHUB_REPO_OWNER)"
     @echo "Using GITHUB_REQUEST_DELAY: $(GITHUB_REQUEST_DELAY)"
-    
+
 #---
 #
 #@ install
@@ -206,7 +206,6 @@ endif
 #* PARAMETERS:
 #** CLUSTER_TYPE:   Set the cluster type to install on [ openshift | k8s ]
 #** NAMESPACE:      Set the namespace to uninstall the resources from
-#** UNINSTALL_ALL:  Uninstall all Camel K resources including crds and cluster roles installed by setup-cluster [true|false]
 #** DRY_RUN:        Print the resources to be applied instead of applying them [true|false]
 #
 #---

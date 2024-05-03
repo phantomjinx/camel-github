@@ -27,8 +27,8 @@ spec:
     spec:
       volumes:
         - name: camel-github-storage
-          persistentVolumeClaim:
-            claimName: camel-github-storage
+          emptyDir:
+            sizeLimit: 500Mi
       containers:
       - env:
         - name: KUBERNETES_NAMESPACE
